@@ -6,8 +6,8 @@ using System.Windows.Media;
 namespace TaskbarCalendar.Views.Controls;
 
 /// <summary>
-/// 统一的事项行控件：勾选框/备忘圆点 + 标题 + 时间/标签标签。
-/// 标签合并了原优先级与重复：重要（红）/ 高亮（绿）/ 周期（紫）。
+/// 统一的事项行控件：勾选框/备忘圆点 + 标题 + 分类标签。
+/// 标签合并了原优先级与重复：重要（红）/ 项目（绿）/ 周期（紫）。
 /// </summary>
 public partial class ItemRowView : UserControl
 {
@@ -35,18 +35,11 @@ public partial class ItemRowView : UserControl
         new PropertyMetadata(0, OnVisualPropertyChanged));
 
     /// <summary>
-    /// 标签：0 无 / 1 重要 / 2 高亮 / 3 周期。
+    /// 标签：0 无 / 1 重要 / 2 项目 / 3 周期。
     /// </summary>
     public static readonly DependencyProperty ItemTagProperty = DependencyProperty.Register(
         nameof(ItemTag), typeof(int), typeof(ItemRowView),
         new PropertyMetadata(0, OnVisualPropertyChanged));
-
-    /// <summary>
-    /// 日期文本；空字符串表示无日期，不显示时间标签。
-    /// </summary>
-    public static readonly DependencyProperty DueTextProperty = DependencyProperty.Register(
-        nameof(DueText), typeof(string), typeof(ItemRowView),
-        new PropertyMetadata("", OnVisualPropertyChanged));
 
     public static readonly DependencyProperty IsOverdueProperty = DependencyProperty.Register(
         nameof(IsOverdue), typeof(bool), typeof(ItemRowView),
@@ -121,10 +114,10 @@ public partial class ItemRowView : UserControl
         set => SetValue(ItemTagProperty, value);
     }
 
-    public string DueText
+    public string TagLabel
     {
-        get => (string)GetValue(DueTextProperty);
-        set => SetValue(DueTextProperty, value);
+        get => (string)GetValue(TagLabelProperty);
+        set => SetValue(TagLabelProperty, value);
     }
 
     public bool IsOverdue
@@ -149,12 +142,6 @@ public partial class ItemRowView : UserControl
     {
         get => (bool)GetValue(IsReadOnlyProperty);
         set => SetValue(IsReadOnlyProperty, value);
-    }
-
-    public string TagLabel
-    {
-        get => (string)GetValue(TagLabelProperty);
-        set => SetValue(TagLabelProperty, value);
     }
 
     public bool ShowDot
@@ -204,10 +191,6 @@ public partial class ItemRowView : UserControl
         NoteIcon.Visibility = HasNote ? Visibility.Visible : Visibility.Collapsed;
         ToolTip = HasNote && string.IsNullOrWhiteSpace(NoteText) is false ? NoteText : null;
 
-        DatePill.Visibility = string.IsNullOrEmpty(DueText) ? Visibility.Collapsed : Visibility.Visible;
-        DateText.Text = DueText;
-        DateText.Foreground = new SolidColorBrush(IsOverdue ? Color.FromRgb(0xD9, 0x3A, 0x3A) : Color.FromRgb(0x7A, 0x7F, 0x87));
-
         bool _show_tag = ItemTag is > 0 and <= 3;
         TagPill.Visibility = _show_tag ? Visibility.Visible : Visibility.Collapsed;
         if (_show_tag)
@@ -215,11 +198,11 @@ public partial class ItemRowView : UserControl
             (TagText.Text, TagText.Foreground, TagPill.Background) = ItemTag switch
             {
                 1 => ("重要", new SolidColorBrush(Color.FromRgb(0xD9, 0x3A, 0x3A)), new SolidColorBrush(Color.FromRgb(0xFB, 0xE9, 0xE9))),
-                2 => ("高亮", new SolidColorBrush(Color.FromRgb(0x2E, 0x9E, 0x5B)), new SolidColorBrush(Color.FromRgb(0xE6, 0xF5, 0xEC))),
+                2 => ("项目", new SolidColorBrush(Color.FromRgb(0x2E, 0x9E, 0x5B)), new SolidColorBrush(Color.FromRgb(0xE6, 0xF5, 0xEC))),
                 _ => ("周期", new SolidColorBrush(Color.FromRgb(0x6B, 0x3F, 0xE0)), new SolidColorBrush(Color.FromRgb(0xED, 0xE1, 0xFF)))
             };
 
-            // - 面板里用分类名（项目/重复）替代默认文字
+            // - 面板里用分类名（项目/周期）替代默认文字
             if (string.IsNullOrEmpty(TagLabel) is false)
             {
                 TagText.Text = TagLabel;

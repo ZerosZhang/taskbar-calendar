@@ -278,7 +278,6 @@ public partial class FlyoutWindow : Window
                     Title = _item.Title,
                     Kind = _item.Kind,
                     Tag = _item.Tag,
-                    DueDate = _due,
                     IsCompleted = _item.Kind == TodoKind.Done,
                     ShowDot = _item.TodoType is not 1,
                     TagText = ToTagText(_item.Tag),
@@ -295,7 +294,7 @@ public partial class FlyoutWindow : Window
             {
                 if (_day_ids.Add(_record.Id))
                 {
-                    _day_rows.Add(ToRow(_record, SelectedDate));
+                    _day_rows.Add(ToRow(_record));
                 }
             }
         }
@@ -318,10 +317,9 @@ public partial class FlyoutWindow : Window
                 Title = _repeat_item.Title,
                 Kind = _repeat_item.Kind,
                 Tag = TodoTag.Periodic,
-                DueDate = SelectedDate,
                 ShowDot = true,
                 IsReadOnly = true,
-                TagText = "重复",
+                TagText = "周期",
                 HasNote = string.IsNullOrWhiteSpace(_repeat_item.Note) is false,
                 NoteText = _repeat_item.Note
             });
@@ -331,7 +329,7 @@ public partial class FlyoutWindow : Window
         DayItemsControl.ItemsSource = _day_rows;
         DayEmptyText.Visibility = _day_rows.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
-        List<TodoRow> _no_date_rows = Database.GetWithoutDate().Select(_record => ToRow(_record, null)).ToList();
+        List<TodoRow> _no_date_rows = Database.GetWithoutDate().Select(ToRow).ToList();
         NoDateItemsControl.ItemsSource = _no_date_rows;
         NoDateEmptyText.Visibility = _no_date_rows.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         NoDateCountText.Text = $"· {_no_date_rows.Count} 条";
@@ -341,7 +339,7 @@ public partial class FlyoutWindow : Window
         CountText.Text = $"{_todo_count} 项待办 · {_memo_count} 条备忘";
     }
 
-    private static TodoRow ToRow(TodoItemRecord _record, DateOnly? _due_date)
+    private static TodoRow ToRow(TodoItemRecord _record)
     {
         return new TodoRow
         {
@@ -349,7 +347,6 @@ public partial class FlyoutWindow : Window
             Title = _record.Title,
             Kind = _record.Kind,
             Tag = _record.Tag,
-            DueDate = _due_date,
             IsCompleted = _record.Kind == TodoKind.Done,
             ShowDot = _record.TodoType is not 1,
             TagText = ToTagText(_record.Tag),
@@ -427,7 +424,7 @@ public partial class FlyoutWindow : Window
     {
         TodoTag.Important => "重要",
         TodoTag.Highlight => "项目",
-        TodoTag.Periodic => "重复",
+        TodoTag.Periodic => "周期",
         _ => ""
     };
 

@@ -57,32 +57,16 @@
                   Data="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z M14 2v5a1 1 0 0 0 1 1h5 M10 9H8 M16 13H8 M16 17H8" />
         </WrapPanel>
 
-        <!-- 时间 / 标签 -->
-        <Grid Grid.Column="2" VerticalAlignment="Center">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80" />
-                <ColumnDefinition Width="42" />
-            </Grid.ColumnDefinitions>
-
-            <Border x:Name="DatePill"
-                    Grid.Column="0"
-                    HorizontalAlignment="Right"
-                    Margin="0,0,4,0"
-                    Padding="6,1"
-                    CornerRadius="4"
-                    Background="#EEF1F5"
-                    Visibility="Collapsed">
-                <TextBlock x:Name="DateText" FontSize="10" Foreground="#7A7F87" />
-            </Border>
-            <Border x:Name="TagPill"
-                    Grid.Column="1"
-                    HorizontalAlignment="Center"
-                    Padding="6,1"
-                    CornerRadius="4"
-                    Visibility="Collapsed"
-                    MouseLeftButtonDown="TagPill_MouseLeftButtonDown">
-                <TextBlock x:Name="TagText" FontSize="10" />
-            </Border>
-        </Grid>
+        <!-- 标签：重要 / 项目 / 周期 -->
+        <Border x:Name="TagPill"
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                Margin="8,0,0,0"
+                Padding="6,1"
+                CornerRadius="4"
+                Visibility="Collapsed"
+                MouseLeftButtonDown="TagPill_MouseLeftButtonDown">
+            <TextBlock x:Name="TagText" FontSize="10" />
+        </Border>
     </Grid>
 </UserControl>

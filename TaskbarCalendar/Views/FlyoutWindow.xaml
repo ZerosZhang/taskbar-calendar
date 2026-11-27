@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:TaskbarCalendar.Views.Controls"
         mc:Ignorable="d"
-        Width="720" Height="436"
+        Width="640" Height="436"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -122,8 +122,7 @@
                 <controls:ItemRowView Title="{Binding Title}"
                                       Kind="{Binding Kind}"
                                       ItemTag="{Binding Tag}"
-                                      DueText="{Binding DueText}"
-                                              IsOverdue="{Binding IsOverdue}"
+                                      IsOverdue="{Binding IsOverdue}"
                                       HasNote="{Binding HasNote}"
                                       NoteText="{Binding NoteText}"
                                       IsReadOnly="{Binding IsReadOnly}"
@@ -142,7 +141,7 @@
                     <Setter TargetName="Row" Property="Background" Value="#332E9E5B" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Tag}" Value="3">
-                    <Setter TargetName="Row" Property="Background" Value="#EDE1FF" />
+                    <Setter TargetName="Row" Property="Background" Value="#336B3FE0" />
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
