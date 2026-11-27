@@ -1,0 +1,93 @@
+<Window x:Class="TaskbarCalendar.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Width="560" Height="420"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Microsoft YaHei UI"
+        Title="任务栏日历">
+
+    <Border Margin="12"
+            CornerRadius="12"
+            Background="#F8F9FB"
+            BorderBrush="#D8DCE3"
+            BorderThickness="1"
+            MouseLeftButtonDown="Header_MouseLeftButtonDown">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="24" ShadowDepth="0" Opacity="0.5" Color="Black" />
+        </Border.Effect>
+
+        <Grid Margin="24,18,20,18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0"
+                  Margin="0,0,0,12"
+                  Background="Transparent"
+                  MouseLeftButtonDown="Header_MouseLeftButtonDown">
+                <TextBlock Text="关于" FontSize="14" FontWeight="SemiBold" Foreground="#1C1C1E" />
+                <Button Content="✕"
+                        Width="26"
+                        Height="26"
+                        HorizontalAlignment="Right"
+                        Style="{StaticResource SecondaryButton}"
+                        Padding="0"
+                        Click="Close_Click" />
+            </Grid>
+
+            <StackPanel Grid.Row="1" Margin="0,6,0,0">
+                <TextBlock Text="任务栏日历" FontSize="13" FontWeight="SemiBold" Foreground="#1C1C1E" />
+                <TextBlock x:Name="AboutVersionText" Margin="0,6,0,12" FontSize="11" Foreground="#5F6368" />
+                <TextBlock Text="接管任务栏时钟点击，弹出事项面板；面板数据来自时光序，缓存在本机 SQLite。"
+                           FontSize="12"
+                           Foreground="#4A4F57"
+                           TextWrapping="Wrap" />
+
+                <Border Height="1" Background="#E8EAF0" Margin="0,16,0,14" />
+
+                <CheckBox x:Name="StartupCheck"
+                          Content="开机自动启动"
+                          Style="{StaticResource FieldCheckBox}"
+                          Margin="0,0,0,4"
+                          Checked="StartupCheck_Changed"
+                          Unchecked="StartupCheck_Changed" />
+                <TextBlock x:Name="StartupHint"
+                           Margin="22,0,0,0"
+                           FontSize="11"
+                           Foreground="#8A8F98"
+                           TextWrapping="Wrap"
+                           Text="在「启动」文件夹创建一个快捷方式" />
+
+                <Border Height="1" Background="#E8EAF0" Margin="0,16,0,14" />
+
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="数据目录"
+                               FontSize="11"
+                               Foreground="#5F6368"
+                               VerticalAlignment="Center" />
+                    <TextBlock x:Name="DataDirectoryText"
+                               Grid.Column="1"
+                               Margin="10,0,0,0"
+                               FontSize="11"
+                               Foreground="#4A4F57"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" />
+                </Grid>
+
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="打开数据目录" Style="{StaticResource SecondaryButton}" Click="OpenDataDirectory_Click" />
+                    <Button Content="退出程序" Margin="8,0,0,0" Style="{StaticResource SecondaryButton}" Click="Exit_Click" />
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

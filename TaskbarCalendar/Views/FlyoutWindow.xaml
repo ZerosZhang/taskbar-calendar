@@ -1,0 +1,354 @@
+<Window x:Class="TaskbarCalendar.Views.FlyoutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:TaskbarCalendar.Views.Controls"
+        mc:Ignorable="d"
+        Width="720" Height="436"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Topmost="True"
+        Opacity="0"
+        d:Opacity="1"
+        WindowStartupLocation="Manual"
+        FontFamily="Microsoft YaHei UI"
+        Title="TaskbarCalendar"
+        Deactivated="FlyoutWindow_Deactivated"
+        PreviewKeyDown="FlyoutWindow_PreviewKeyDown">
+
+    <Window.Resources>
+        <!-- 面板底部的小按钮：白底 + 描边 + 轻投影，比纯文字更像按钮 -->
+        <Style x:Key="PanelButton" TargetType="Button">
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Foreground" Value="#3C4043" />
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#D8DCE3" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="3" ShadowDepth="1" Opacity="0.12" Color="Black" />
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#F2F4F8" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#C4C9D2" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#E6EAF0" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="MonthNavButton" TargetType="Button">
+            <Setter Property="Width" Value="26" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="#4A4F57" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="NavBorder" Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="NavBorder" Property="Background" Value="#E8EAF0" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="GhostButton" TargetType="Button">
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Foreground" Value="#3C4043" />
+            <Setter Property="Background" Value="#F2F4F8" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="GhostBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="GhostBorder" Property="Background" Value="#E2E6EF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <DataTemplate x:Key="ItemTemplate">
+            <Border x:Name="Row"
+                    Margin="0,0,0,4"
+                    Padding="10,6"
+                    CornerRadius="8"
+                    Background="#F1F3F7">
+                <controls:ItemRowView Title="{Binding Title}"
+                                      Kind="{Binding Kind}"
+                                      ItemTag="{Binding Tag}"
+                                      DueText="{Binding DueText}"
+                                              IsOverdue="{Binding IsOverdue}"
+                                      HasNote="{Binding HasNote}"
+                                      NoteText="{Binding NoteText}"
+                                      IsReadOnly="{Binding IsReadOnly}"
+                                      ShowDot="{Binding ShowDot}"
+                                      TagLabel="{Binding TagText}"
+                                      CheckRequested="ItemRow_CheckRequested" />
+            </Border>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                    <Setter TargetName="Row" Property="Background" Value="#0D000000" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tag}" Value="1">
+                    <Setter TargetName="Row" Property="Background" Value="#33D93A3A" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tag}" Value="2">
+                    <Setter TargetName="Row" Property="Background" Value="#332E9E5B" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tag}" Value="3">
+                    <Setter TargetName="Row" Property="Background" Value="#EDE1FF" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid x:Name="RootPanel">
+        <Border Margin="16"
+                CornerRadius="12"
+                Background="#F8F9FB"
+                BorderBrush="#D8DCE3"
+                BorderThickness="1">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="24" ShadowDepth="0" Opacity="0.5" Color="Black" />
+            </Border.Effect>
+
+            <Grid Margin="18,16,18,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="18" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- 左栏：时间卡 + 月历 + 底部按钮，与右栏同一上下边界 -->
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0"
+                            CornerRadius="12"
+                            Background="#F2F4F8"
+                            BorderBrush="#E4E7EC"
+                            BorderThickness="1"
+                            Padding="14,10">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="TimeText"
+                                           FontSize="32"
+                                           FontWeight="SemiBold"
+                                           Foreground="#1C1C1E" />
+                            </StackPanel>
+                            <TextBlock x:Name="DateText"
+                                       Margin="0,2,0,0"
+                                       FontSize="12"
+                                       Foreground="#5F6368" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 上下两个 * 行等高，保证时间卡/月历/按钮三段间隔一致 -->
+                    <StackPanel Grid.Row="2">
+                        <Grid>
+                            <TextBlock x:Name="MonthText"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="#2A2A2E"
+                                       VerticalAlignment="Center" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Style="{StaticResource MonthNavButton}"
+                                        Content="‹"
+                                        ToolTip="上个月"
+                                        Click="MonthPrev_Click" />
+                                <Button Style="{StaticResource MonthNavButton}"
+                                        Content="›"
+                                        ToolTip="下个月"
+                                        Click="MonthNext_Click" />
+                                <Button Style="{StaticResource GhostButton}"
+                                        Content="今天"
+                                        Margin="8,0,0,0"
+                                        Click="Today_Click" />
+                            </StackPanel>
+                        </Grid>
+
+                        <controls:CalendarView x:Name="CalendarBoard"
+                                               Margin="0,4,0,0"
+                                               CellSize="28"
+                                               DayFontSize="11"
+                                               HorizontalAlignment="Left" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="4" Orientation="Horizontal">
+                        <Button Content="管理"
+                                Style="{StaticResource PanelButton}"
+                                Click="SettingsButton_Click" />
+                        <Button x:Name="RefreshButton"
+                                Content="刷新"
+                                Margin="8,0,0,0"
+                                Style="{StaticResource PanelButton}"
+                                ToolTip="立即同步时光序数据"
+                                Click="Refresh_Click" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- 右栏：事项列表 -->
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                        <TextBlock x:Name="SelectedDayText"
+                                   FontSize="12"
+                                   Foreground="#5F6368" />
+                        <TextBlock x:Name="CountText"
+                                   HorizontalAlignment="Right"
+                                   FontSize="11"
+                                   Foreground="#8A8F98" />
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="1"
+                                  Background="Transparent"
+                                  VerticalScrollBarVisibility="Hidden"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl x:Name="DayItemsControl"
+                                      ItemTemplate="{StaticResource ItemTemplate}" />
+                    </ScrollViewer>
+
+                    <TextBlock x:Name="DayEmptyText"
+                               Grid.Row="1"
+                               Text="这一天还没有事项"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="11"
+                               Foreground="#B6B9BF"
+                               Visibility="Collapsed" />
+
+                    <Grid Grid.Row="2" Margin="0,10,0,10">
+                        <Border Height="1" VerticalAlignment="Top" Background="#E8EAF0" />
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <TextBlock Text="无日期" FontSize="12" Foreground="#5F6368" />
+                            <TextBlock x:Name="NoDateCountText"
+                                       Margin="6,0,0,0"
+                                       FontSize="11"
+                                       Foreground="#8A8F98"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="3"
+                                  Background="Transparent"
+                                  VerticalScrollBarVisibility="Hidden"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl x:Name="NoDateItemsControl"
+                                      ItemTemplate="{StaticResource ItemTemplate}" />
+                    </ScrollViewer>
+
+                    <TextBlock x:Name="NoDateEmptyText"
+                               Grid.Row="3"
+                               Text="没有未排期的事项"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="11"
+                               Foreground="#B6B9BF"
+                               Visibility="Collapsed" />
+
+                    <Border Grid.Row="4"
+                            Height="38"
+                            Margin="0,10,0,0"
+                            CornerRadius="8"
+                            Background="#FFFFFF"
+                            BorderBrush="#D8DCE3"
+                            BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <!-- 文字由下面的预览层绘制，才能把识别出的时间标成橙色 -->
+                            <TextBlock x:Name="QuickAddPreview"
+                                       Margin="12,0,12,0"
+                                       FontSize="12"
+                                       Foreground="#1C1C1E"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False"
+                                       Visibility="Collapsed"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBox x:Name="QuickAddBox"
+                                     Margin="12,0,12,0"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     CaretBrush="#1C1C1E"
+                                     FontSize="12"
+                                     Foreground="Transparent"
+                                     VerticalContentAlignment="Center"
+                                     TextChanged="QuickAddBox_TextChanged"
+                                     KeyDown="QuickAddBox_KeyDown" />
+                            <TextBlock x:Name="QuickAddHint"
+                                       Margin="14,0,0,0"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       Foreground="#8A8F98"
+                                       IsHitTestVisible="False"
+                                       Text="添加事项到时光序，回车保存" />
+                        </Grid>
+                    </Border>
+
+                </Grid>
+            </Grid>
+        </Border>
+
+    </Grid>
+</Window>

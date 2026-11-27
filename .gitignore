@@ -1,0 +1,22 @@
+# 构建产物
+bin/
+obj/
+Publish/
+
+# 运行时数据（含个人事项与本地缓存）
+data/
+*.db
+*.db-wal
+*.db-shm
+app.log
+
+# 编辑器 / IDE
+.vs/
+*.user
+*.suo
+
+# 文档（不纳入版本库）
+docs/
+
+# 临时文件
+.temp/
