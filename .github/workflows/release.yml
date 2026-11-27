@@ -24,10 +24,6 @@ jobs:
         shell: pwsh
         run: ./publish.ps1
 
-      - name: 打包
-        shell: pwsh
-        run: Compress-Archive -Path ./Publish/TaskbarCalendar.exe -DestinationPath ./TaskbarCalendar-win-x64.zip -Force
-
       - name: 从更新日志取本节说明
         shell: pwsh
         run: |
@@ -60,11 +56,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: TaskbarCalendar-win-x64
-          path: TaskbarCalendar-win-x64.zip
+          path: ./Publish/TaskbarCalendar.exe
 
       - name: 创建 Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: TaskbarCalendar-win-x64.zip
+          files: ./Publish/TaskbarCalendar.exe
           body_path: release-notes.md
