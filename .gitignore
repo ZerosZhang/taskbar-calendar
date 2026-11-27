@@ -3,8 +3,7 @@ bin/
 obj/
 Publish/
 
-# 运行时数据（含个人事项与本地缓存）
-data/
+# 运行时数据（缓存与日志，源码目录 Data/ 不受影响）
 *.db
 *.db-wal
 *.db-shm
