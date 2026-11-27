@@ -28,6 +28,34 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path ./Publish/TaskbarCalendar.exe -DestinationPath ./TaskbarCalendar-win-x64.zip -Force
 
+      - name: 从更新日志取本节说明
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}" -replace '^v', ''
+          $log = ".github/ChangeLog.md"
+          $body = @()
+
+          if (Test-Path $log) {
+            $lines = Get-Content $log -Encoding UTF8
+            $pattern = '^##\s+' + [regex]::Escape($tag) + '\s*$'
+            $start = -1
+            for ($i = 0; $i -lt $lines.Count; $i++) {
+              if ($lines[$i] -match $pattern) { $start = $i + 1; break }
+            }
+
+            if ($start -ge 0) {
+              $end = $lines.Count
+              for ($i = $start; $i -lt $lines.Count; $i++) {
+                if ($lines[$i] -match '^##\s') { $end = $i; break }
+              }
+              $body = $lines[$start..($end - 1)]
+            }
+          }
+
+          # 找不到小节就写空文件，发布说明留空
+          ($body -join "`n").Trim() | Set-Content release-notes.md -Encoding UTF8
+          Write-Host "版本：$tag，说明行数：$($body.Count)"
+
       - name: 上传构建产物
         uses: actions/upload-artifact@v4
         with:
@@ -39,4 +67,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: TaskbarCalendar-win-x64.zip
-          generate_release_notes: true
+          body_path: release-notes.md
